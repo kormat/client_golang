@@ -50,6 +50,7 @@ type ProcessCollectorOpts struct {
 	// metrics are nice to have, but failing to collect them should not
 	// disrupt the collection of the remaining metrics.
 	ReportErrors bool
+	ConstLabels  Labels
 }
 
 // NewProcessCollector returns a collector which exports the current state of
@@ -84,37 +85,37 @@ func NewProcessCollector(opts ProcessCollectorOpts) Collector {
 		cpuTotal: NewDesc(
 			ns+"process_cpu_seconds_total",
 			"Total user and system CPU time spent in seconds.",
-			nil, nil,
+			nil, opts.ConstLabels,
 		),
 		openFDs: NewDesc(
 			ns+"process_open_fds",
 			"Number of open file descriptors.",
-			nil, nil,
+			nil, opts.ConstLabels,
 		),
 		maxFDs: NewDesc(
 			ns+"process_max_fds",
 			"Maximum number of open file descriptors.",
-			nil, nil,
+			nil, opts.ConstLabels,
 		),
 		vsize: NewDesc(
 			ns+"process_virtual_memory_bytes",
 			"Virtual memory size in bytes.",
-			nil, nil,
+			nil, opts.ConstLabels,
 		),
 		maxVsize: NewDesc(
 			ns+"process_virtual_memory_max_bytes",
 			"Maximum amount of virtual memory available in bytes.",
-			nil, nil,
+			nil, opts.ConstLabels,
 		),
 		rss: NewDesc(
 			ns+"process_resident_memory_bytes",
 			"Resident memory size in bytes.",
-			nil, nil,
+			nil, opts.ConstLabels,
 		),
 		startTime: NewDesc(
 			ns+"process_start_time_seconds",
 			"Start time of the process since unix epoch in seconds.",
-			nil, nil,
+			nil, opts.ConstLabels,
 		),
 	}
 

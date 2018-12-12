@@ -31,6 +31,14 @@ import (
 // create a Desc.
 type Labels map[string]string
 
+func (l Labels) Copy() Labels {
+	nl := make(Labels)
+	for k := range l {
+		nl[k] = l[k]
+	}
+	return nl
+}
+
 // reservedLabelPrefix is a prefix which is not legal in user-supplied
 // label names.
 const reservedLabelPrefix = "__"

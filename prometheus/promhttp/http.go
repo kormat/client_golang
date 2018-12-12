@@ -75,6 +75,7 @@ var gzipPool = sync.Pool{
 func Handler() http.Handler {
 	return InstrumentMetricHandler(
 		prometheus.DefaultRegisterer, HandlerFor(prometheus.DefaultGatherer, HandlerOpts{}),
+		prometheus.Labels{"foo": "http"},
 	)
 }
 
@@ -189,11 +190,13 @@ func HandlerFor(reg prometheus.Gatherer, opts HandlerOpts) http.Handler {
 // code is known). For tracking scrape durations, use the
 // "scrape_duration_seconds" gauge created by the Prometheus server upon each
 // scrape.
-func InstrumentMetricHandler(reg prometheus.Registerer, handler http.Handler) http.Handler {
+func InstrumentMetricHandler(reg prometheus.Registerer, handler http.Handler,
+	constLabels prometheus.Labels) http.Handler {
 	cnt := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "promhttp_metric_handler_requests_total",
-			Help: "Total number of scrapes by HTTP status code.",
+			Name:        "promhttp_metric_handler_requests_total",
+			Help:        "Total number of scrapes by HTTP status code.",
+			ConstLabels: constLabels,
 		},
 		[]string{"code"},
 	)
@@ -210,8 +213,9 @@ func InstrumentMetricHandler(reg prometheus.Registerer, handler http.Handler) ht
 	}
 
 	gge := prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "promhttp_metric_handler_requests_in_flight",
-		Help: "Current number of scrapes being served.",
+		Name:        "promhttp_metric_handler_requests_in_flight",
+		Help:        "Current number of scrapes being served.",
+		ConstLabels: constLabels,
 	})
 	if err := reg.Register(gge); err != nil {
 		if are, ok := err.(prometheus.AlreadyRegisteredError); ok {
